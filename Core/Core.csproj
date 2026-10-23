@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\Tools\Common.props" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Violty.SvgGenerator</RootNamespace>
+    <AssemblyName>SvgGenerator</AssemblyName>
+    <AssemblyTitle>SVG Icon Generator by AI</AssemblyTitle>
+  </PropertyGroup>
+
+  <Import Project="..\Tools\Build.props" />
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Agents.AI.Foundry" />
+    <PackageReference Include="Trivial.Console" />
+  </ItemGroup>
+
+</Project>

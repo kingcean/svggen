@@ -1,0 +1,27 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Product>Violty SVG Generator</Product>
+    <Authors>Kingcean Tuan</Authors>
+    <Company>Nanchang Jinchen Software Co., Ltd.</Company>
+    <Version>0.0.1</Version>
+    <AssemblyVersion>0.0.1.0</AssemblyVersion>
+    <FileVersion>0.0.1.0</FileVersion>
+    <Copyright>Copyright (c) 2026 Kingcean Tuan. All rights reserved.</Copyright>
+    <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>false</PublishRepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <LangVersion>13.0</LangVersion>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\repo.snk</AssemblyOriginatorKeyFile>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="README.md" />
+    <None Include="..\LICENSE" Pack="true" PackagePath="LICENSE" />
+  </ItemGroup>
+</Project>
