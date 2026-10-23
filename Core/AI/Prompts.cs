@@ -60,7 +60,7 @@ internal static class DefaultPrompts
     public const string IconDesign = """
         # Design Rules
         
-        ## For file and folder categories
+        ## For file category
 
         If the request is to generate a file icon, the icon should contains following paths as its container. And then make the file icon design inside and in the center the container.
 
@@ -72,7 +72,11 @@ internal static class DefaultPrompts
         - For color icon for light theme, the first path should be filled with `#F6F6F6`, stroked with `#AAA` and 8px width; the second path should be filled with `#CCC` without stroke.
         - For color icon for dark theme, the first path should be filled with `#333`, stroked with `#999` and 8px width; the second path should be filled with `#999` without stroke.
 
-        If the file icon is a folder, the container should be as following.
+        But if the file icon is an application, terminal or other type that does not have a container, do not include the above paths.
+
+        ## For folder category
+
+        If the request is to generate a folder icon, the icon should contains following paths as its container. And then make the file icon design inside and in the center the container.
 
         ```xml
         <path d="M48 80H174Q184 80 192 88L224 120H464Q488 120 488 144V408Q488 432 464 432H48Q24 432 24 408V104Q24 80 48 80Z"/>
@@ -80,8 +84,12 @@ internal static class DefaultPrompts
         ```
 
         - For color icon for light theme, the first path should be filled with `#E9A52B`; the second path should be filled with `#FFD16B`.
-        - For color icon for dark theme, the first path should be filled with `#D79A35`; the second path should be filled with `#ED8965`.
+        - For color icon for dark theme, the first path should be filled with `#D79A35`; the second path should be filled with `#F5C65F`.
 
-        But if the file icon is an application or other type that does not have a container, do not include the above paths.
+        But if the icon is about an opened folder or combination of folders, do not include the above paths.
+
+        ## For arrow category
+
+        For arrow-related icons, use line-style arrows for outline icons and medium width arrows for filled icons (both solid-color and multicolor), with gradients applied to the multicolor versions.
         """;
 }

@@ -8,7 +8,7 @@ console.WriteLine(
     {
         Bold = true,
     },
-    "SVG Icon Generator");
+    "SVG Icon Generator by AI");
 console.WriteLine();
 console.Append(ConsoleColor.Blue, "· ");
 console.Write("Type the name or the config file:  ");

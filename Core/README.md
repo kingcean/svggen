@@ -6,6 +6,10 @@ This is the main project for the SVG Icon Generator by AI.
 It contains the core logic and functionality of the application.
 It also contains a CLI tool that allows users to generate SVG icons using AI models.
 
+## Sample
+
+[Icons](https://github.com/kingcean/icons)
+
 ## Settings
 
 ```json

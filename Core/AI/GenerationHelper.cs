@@ -23,14 +23,24 @@ internal class ResourceGenerationHelper
         {
             var obj = JsonObjectNode.TryParse(s);
             if (obj is not null) return obj;
-            if (!s.Contains('.') && !s.Contains(Path.PathSeparator)) return new();
+            if (!s.Contains('.') && !s.Contains(Path.PathSeparator)) return [];
         }
 
         var current = LoadJson(Path.Combine(Environment.CurrentDirectory, "config.json"));
         var application = LoadJson(Path.Combine(AppContext.BaseDirectory, "config.json"));
-        var json = LoadJson(s);
+        var json = LoadJson(s, out var file);
         var chat = json?.TryGetObjectValue("chat") ?? current?.TryGetObjectValue("chat") ?? application?.TryGetObjectValue("chat");
-        var workspace = json?.TryGetObjectValue("workspace") ?? current?.TryGetObjectValue("workspace") ?? application?.TryGetObjectValue("workspace");
+        var workspace = json?.TryGetObjectValue("workspace") ?? current?.TryGetObjectValue("workspace") ?? application?.TryGetObjectValue("workspace") ?? [];
+        var dir = workspace.TryGetStringTrimmedValue("dir", true);
+        if (dir is null || dir == "./" || dir == ".")
+        {
+            if (json is not null && file?.Directory is not null && file.Directory.Exists)
+            {
+                dir = file.Directory.FullName;
+                workspace.SetValue("dir", dir);
+            }
+        }
+
         return new JsonObjectNode
         {
             { "chat", chat },
@@ -38,19 +48,30 @@ internal class ResourceGenerationHelper
         };
     }
 
-    public static JsonObjectNode? LoadJson(string path)
+    public static JsonObjectNode? LoadJson(string? path, out FileInfo? file)
     {
-        if (string.IsNullOrWhiteSpace(path)) return null;
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            file = null;
+            return null;
+        }
+
         try
         {
-            return JsonObjectNode.TryParse(new FileInfo(path));
+            file = new FileInfo(path);
+            if (!file.Exists) return null;
+            return JsonObjectNode.TryParse(file);
         }
         catch (Exception ex)
         when (ex is IOException or UnauthorizedAccessException or SecurityException or ArgumentException or NotSupportedException or NotImplementedException or ExternalException)
         {
+            file = null;
             return null;
         }
     }
+
+    public static JsonObjectNode? LoadJson(string path)
+        => LoadJson(path, out _);
 
     /// <summary>
     /// Creates chat request options with medium reasoning effort.

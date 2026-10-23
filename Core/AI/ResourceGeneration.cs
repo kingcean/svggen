@@ -85,10 +85,19 @@ public abstract class BaseResourceGeneration<T>
     /// <summary>
     /// Gets the configured workspace directory without creating it.
     /// </summary>
+    /// <param name="root">true if returns the root directory of work space; otherwise, false.</param>
     /// <returns>The configured directory, or a subdirectory named by <see cref="Key"/> under the current directory.</returns>
-    public DirectoryInfo GetWorkspaceDirectory()
+    public DirectoryInfo GetWorkspaceDirectory(bool root = false)
     {
-        var dir = Workspace?.Directory ?? Path.Combine(Environment.CurrentDirectory, Key);
+        var dir = Workspace?.Directory ?? Path.Combine(Environment.CurrentDirectory, "artifacts");
+        if (!root && Workspace is not null)
+        {
+            if (Workspace.Folders is not null && Workspace.Folders.TryGetValue(Key, out var folder) && !string.IsNullOrWhiteSpace(folder))
+                dir = Path.Combine(dir, folder);
+            else if (!string.IsNullOrWhiteSpace(Workspace.OtherResourceFolder))
+                dir = Path.Combine(dir, Workspace.OtherResourceFolder.Trim());
+        }
+
         return new DirectoryInfo(dir);
     }
 
@@ -143,15 +152,18 @@ public abstract class BaseResourceGeneration<T>
     /// <param name="rewrite"><see langword="true"/> to skip items whose output already exists; <see langword="false"/> to process all items with a nonblank key.</param>
     /// <param name="cancellationToken">The token used to cancel existence checks, generation, and processing.</param>
     /// <returns>An asynchronous sequence pairing each successfully generated model with its batch requirement.</returns>
-    public async IAsyncEnumerable<BatchRequirementItemResult<T>> BatchProcessAsync(string path, bool rewrite, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    public async IAsyncEnumerable<BatchRequirementItemResult<T>> BatchProcessAsync(string? path, bool rewrite, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        if (string.IsNullOrWhiteSpace(path))
+            path = Path.Combine(GetWorkspaceDirectory(false).FullName, "content.json");
         var file = new FileInfo(path);
+        if (!file.Exists) yield break;
         var json = JsonObjectNode.TryParse(file);
         var content = json.DeserializeValue<List<BatchRequirementItem>>(Key);
         foreach (var item in content)
         {
             if (string.IsNullOrWhiteSpace(item?.Key)) continue;
-            if (rewrite && await ExistsAsync(item, cancellationToken)) continue;
+            if (!rewrite && await ExistsAsync(item, cancellationToken)) continue;
             var desc = item.Description;
             if (string.IsNullOrWhiteSpace(desc))
             {
@@ -181,7 +193,7 @@ public abstract class BaseResourceGeneration<T>
     /// <param name="path">The path to the JSON file containing requirements under <see cref="Key"/>.</param>
     /// <param name="cancellationToken">The token used to cancel generation and processing.</param>
     /// <returns>An asynchronous sequence pairing each successfully generated model with its batch requirement.</returns>
-    public IAsyncEnumerable<BatchRequirementItemResult<T>> BatchProcessAsync(string path, CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<BatchRequirementItemResult<T>> BatchProcessAsync(string? path, CancellationToken cancellationToken = default)
         => BatchProcessAsync(path, false, cancellationToken);
 
     /// <summary>
@@ -224,7 +236,7 @@ public abstract class BaseResourceGeneration<T>
     protected abstract Task OnProcessAsync(T model, string container, string fileName, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Processes resource data into output files in the configured workspace or the default icons directory.
+    /// Processes resource data into output files in the configured workspace or the default resource directory.
     /// </summary>
     /// <param name="model">The resource model to process.</param>
     /// <param name="fileName">The output file name without a directory path. The .svg extension is appended if missing.</param>
@@ -243,7 +255,7 @@ public abstract class BaseResourceGeneration<T>
             fileName += ".svg";
         if (string.IsNullOrWhiteSpace(Path.GetFileNameWithoutExtension(fileName)))
             throw new ArgumentException("The file name must not consist solely of an extension.", nameof(fileName));
-        var dir = Workspace?.Directory ?? Path.Combine(Environment.CurrentDirectory, "icons");
+        var dir = GetWorkspaceDirectory().FullName;
         Directory.CreateDirectory(dir);
         await OnProcessAsync(model, dir, fileName, cancellationToken);
     }
