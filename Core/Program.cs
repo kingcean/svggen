@@ -44,5 +44,49 @@ console.WriteLine(" to generate.");
 console.Write("> ");
 var q = console.ReadLine();
 if (string.IsNullOrWhiteSpace(q)) return;
-var m = await service.ProcesssAsync(q, name);
+console.Write("Generating…");
+try
+{
+    var m = await service.ProcesssAsync(q, name);
+    console.Clear(StyleConsole.RelativeAreas.Line);
+    console.BackspaceToBeginning();
+    console.WriteLine(ConsoleColor.Green, "Generated.");
+}
+catch (Exception ex)
+{
+    console.Clear(StyleConsole.RelativeAreas.Line);
+    console.BackspaceToBeginning();
+    console.Append(ConsoleColor.Red, "Error \t");
+    console.WriteLine(ex.Message);
+}
+
 console.WriteLine();
+while(true)
+{
+    console.Write("Type the icon name:  ");
+    name = console.ReadLine();
+    if (string.IsNullOrWhiteSpace(name)) return;
+    console.Append("Type the theme and requirements for the icon, then press ");
+    console.Append(ConsoleColor.Yellow, "Enter");
+    console.WriteLine(" to generate.");
+    console.Write("> ");
+    q = console.ReadLine();
+    if (string.IsNullOrWhiteSpace(q)) return;
+    console.Write("Generating…");
+    try
+    {
+        var m = await service.ProcesssAsync(q, name);
+        console.Clear(StyleConsole.RelativeAreas.Line);
+        console.BackspaceToBeginning();
+        console.WriteLine(ConsoleColor.Green, "Generated.");
+    }
+    catch (Exception ex)
+    {
+        console.Clear(StyleConsole.RelativeAreas.Line);
+        console.BackspaceToBeginning();
+        console.Append(ConsoleColor.Red, "Error \t");
+        console.WriteLine(ex.Message);
+    }
+
+    console.WriteLine();
+}

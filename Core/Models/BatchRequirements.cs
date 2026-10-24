@@ -41,6 +41,25 @@ public class BatchRequirementItem
     /// </summary>
     [JsonExtensionData]
     public Dictionary<string, JsonElement> AdditionalProperties { get; set; }
+
+    /// <summary>
+    /// Returns a string that represents the current object.
+    /// </summary>
+    /// <returns>A string that represents the current object.</returns>
+    public override string ToString()
+    {
+        if (!string.IsNullOrWhiteSpace(Description)) return Description;
+        var sb = new StringBuilder(Name);
+        var categories = Categories;
+        if (categories is not null && categories.Count > 0)
+        {
+            sb.Append(" (categories: ");
+            sb.Append(string.Join("; ", categories));
+            sb.Append(')');
+        }
+
+        return sb.ToString();
+    }
 }
 
 /// <summary>
@@ -112,4 +131,11 @@ public class BatchRequirementItemResult<T>
     /// </summary>
     [JsonPropertyName("output")]
     public T Output { get; set; }
+
+    /// <summary>
+    /// Returns a string that represents the current object.
+    /// </summary>
+    /// <returns>A string that represents the current object.</returns>
+    public override string ToString()
+        => Input?.ToString() ?? (Output is null ? "Empty" : $"[{Output.GetType().Name}]");
 }
