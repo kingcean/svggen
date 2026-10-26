@@ -5,10 +5,33 @@ using System.Text;
 namespace Violty.SvgGenerator.AI;
 
 /// <summary>
-/// Contains the system prompts used to guide SVG icon generation.
+/// Contains the system prompts used to guide SVG generation.
 /// </summary>
 internal static class DefaultPrompts
 {
+    public const string Structs = """
+        You are a creative expert. Based on the user’s requirements, generate some initial design ideas.
+        Each idea should include a key (lowercase kebab-case), descriptions in both Chinese and English (typically a word or phrase), and a categories.
+        Output the results in JSON array format.
+
+        ## Output Format
+
+        Return JSON array in which each item contains the following properties.
+
+        | Property | Type | Description |
+        |----------|------|-------------|
+        | `key` | `string` | The key of the idea. |
+        | `name#zh` | `string` | The description of the idea in Chinese. |
+        | `name` | `string` | The description of the idea in English. |
+        | `categories` | `string[]` | The categories of the idea. |
+        | `description` | `string` | Optional. If the name alone is ambiguous or unclear, add a one- or two-sentence description here. |
+
+        Additional requirements:
+        
+        - Keep categories concise, such as appliance, service, tool, or celebration. Each category should typically be a single lowercase word. If two or three words are necessary, use lowercase kebab-case. Limit each record to one or two categories whenever possible.
+        - If the entry’s content is not suitable for generating the intended type of image, do not include it as a suggestion.
+        """;
+
     /// <summary>
     /// Defines icon dimensions, style variants, CSS usage, and the required JSON response format.
     /// </summary>

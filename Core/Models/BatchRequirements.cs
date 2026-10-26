@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Trivial.Collection;
+using static Trivial.Reflection.ExceptionHandler;
 
 namespace Violty.SvgGenerator.Models;
 
@@ -19,16 +20,22 @@ public class BatchRequirementItem
     public string Key { get; set; }
 
     /// <summary>
-    /// Gets or sets the resource name used to build a prompt when no description is provided.
+    /// Gets or sets the resource name.
     /// </summary>
     [JsonPropertyName("name")]
     public string Name { get; set; }
 
     /// <summary>
-    /// Gets or sets the generation prompt, or a blank value to build it from the name and categories.
+    /// Gets or sets the descripiton used if the name alone is ambiguous or unclear.
     /// </summary>
     [JsonPropertyName("description")]
     public string? Description { get; set; }
+
+    /// <summary>
+    /// Gets or sets the generation prompt, or a blank value to build it from the name and categories.
+    /// </summary>
+    [JsonPropertyName("prompt")]
+    public string? Prompt { get; set; }
 
     /// <summary>
     /// Gets or sets optional categories included in the prompt when no description is provided.
@@ -48,8 +55,19 @@ public class BatchRequirementItem
     /// <returns>A string that represents the current object.</returns>
     public override string ToString()
     {
-        if (!string.IsNullOrWhiteSpace(Description)) return Description;
         var sb = new StringBuilder(Name);
+        ToString(sb);
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// Returns a string that represents the current object.
+    /// </summary>
+    /// <returns>A string that represents the current object.</returns>
+    internal void ToString(StringBuilder sb)
+    {
+        if (sb.Length > 0) sb.AppendLine();
+        sb.Append(Name ?? Key);
         var categories = Categories;
         if (categories is not null && categories.Count > 0)
         {
@@ -58,7 +76,11 @@ public class BatchRequirementItem
             sb.Append(')');
         }
 
-        return sb.ToString();
+        if (!string.IsNullOrWhiteSpace(Description))
+        {
+            sb.Append(": ");
+            sb.Append(Description);
+        }
     }
 }
 

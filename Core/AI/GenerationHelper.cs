@@ -6,6 +6,7 @@ using System.Security;
 using System.Text;
 using System.Text.Json;
 using Trivial.Text;
+using Violty.SvgGenerator.Models;
 using static Trivial.Reflection.ExceptionHandler;
 
 namespace Violty.SvgGenerator.AI;
@@ -106,5 +107,22 @@ internal class ResourceGenerationHelper
 
         sb.AppendLine("```");
         sb.AppendLine();
+    }
+
+    /// <summary>
+    /// Gets the item by key.
+    /// </summary>
+    /// <param name="items">The collection of requirement items.</param>
+    /// <param name="key">The key used to search.</param>
+    /// <returns>The item.</returns>
+    public static BatchRequirementItem? Get(IEnumerable<BatchRequirementItem>? items, string key)
+    {
+        if (items is null) return null;
+        foreach (var item in items)
+        {
+            if (!string.IsNullOrWhiteSpace(item?.Key) && item.Key == key) return item;
+        }
+
+        return null;
     }
 }

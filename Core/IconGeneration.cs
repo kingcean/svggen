@@ -84,6 +84,37 @@ public class IconGeneration : BaseResourceGeneration<IconSet>
     }
 
     /// <inheritdoc />
+    protected override async Task<BatchRequirementItemResult<IconSet>?> GetFromLocal(string fileName, CancellationToken cancellationToken = default)
+    {
+        var result = new IconSet();
+        var dir = GetWorkspaceDirectory().FullName;
+        var svgFileName = fileName.EndsWith(".svg", StringComparison.OrdinalIgnoreCase) ? fileName : fileName + ".svg";
+        (string Name, Action<string> SetSvg)[] icons =
+        [
+            (nameof(IconSet.Line), svg => result.Line = svg),
+            (nameof(IconSet.Solid), svg => result.Solid = svg),
+            (nameof(IconSet.Light), svg => result.Light = svg),
+            (nameof(IconSet.Dark), svg => result.Dark = svg),
+        ];
+        var found = false;
+        foreach (var (name, setSvg) in icons)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var path = Path.Combine(dir, name.ToLowerInvariant(), svgFileName);
+            if (!File.Exists(path)) continue;
+            setSvg(await File.ReadAllTextAsync(path, Encoding.UTF8, cancellationToken));
+            found = true;
+        }
+
+        if (!found) return null;
+        var items = GetItems(null);
+        return new(ResourceGenerationHelper.Get(items, fileName) ?? new()
+        {
+            Key = fileName,
+        }, result);
+    }
+
+    /// <inheritdoc />
     protected override Task<bool> ExistsAsync(BatchRequirementItem item, CancellationToken cancellationToken = default)
     {
         var dir = GetWorkspaceDirectory().FullName;
