@@ -32,14 +32,74 @@ internal static class CliHelper
         console.Write("> ");
         var q = console.ReadLine();
         if (string.IsNullOrWhiteSpace(q) || IsToExit(q) || q == "no") return;
-        await service.AddCache(q, cancellationToken);
-        console.Append("Would you like to add another? Enter the corresponding key or press ");
-        console.Append(ConsoleColor.Yellow, "Enter");
-        console.WriteLine(" to skip.");
+        var m = await service.AddCacheAsync(q, cancellationToken);
+        if (m is not null)
+        {
+            console.Append(ConsoleColor.Green, "Added. \t");
+            console.WriteLine(m.Name);
+            console.Append("Would you like to add another? Enter the corresponding key or press ");
+            console.Append(ConsoleColor.Yellow, "Enter");
+            console.WriteLine(" to skip.");
+        }
+        else
+        {
+            console.WriteLine(ConsoleColor.Red, "Not found.");
+            console.Append("Try again? Enter the corresponding key or press ");
+            console.Append(ConsoleColor.Yellow, "Enter");
+            console.WriteLine(" to cancel.");
+        }
+
         console.Write("> ");
         q = console.ReadLine();
         if (string.IsNullOrWhiteSpace(q) || IsToExit(q) || q == "no") return;
-        await service.AddCache(q, cancellationToken);
+        m = await service.AddCacheAsync(q, cancellationToken);
+        if (m is not null)
+        {
+            console.Append(ConsoleColor.Green, "Added. \t");
+            console.WriteLine(m.Name);
+        }
+        else
+        {
+            console.WriteLine(ConsoleColor.Red, "Not found.");
+        }
+    }
+
+    public static async IAsyncEnumerable<T> GenerateAsync<T>(StyleConsole? console, BaseResourceGeneration<T> service)
+    {
+        console ??= StyleConsole.Default;
+        while (true)
+        {
+            console.Write("Type the key to generate a new icon; or press ");
+            console.Append(ConsoleColor.Yellow, "Enter");
+            console.WriteLine(" to quit.");
+            console.Write("> ");
+            var name = console.ReadLine();
+            if (string.IsNullOrWhiteSpace(name)) yield break;
+            console.WriteLine("Type the theme and requirements for the icon.");
+            console.Write("> ");
+            var q = console.ReadLine();
+            if (string.IsNullOrWhiteSpace(q) || IsToExit(q)) yield break;
+            console.Write("Generating…");
+            T? m;
+            try
+            {
+                m = await service.ProcesssAsync(q, name);
+                console.Clear(StyleConsole.RelativeAreas.Line);
+                console.BackspaceToBeginning();
+                console.WriteLine(ConsoleColor.Green, "Generated.");
+            }
+            catch (Exception ex)
+            {
+                console.Clear(StyleConsole.RelativeAreas.Line);
+                console.BackspaceToBeginning();
+                console.Append(ConsoleColor.Red, "Error \t");
+                console.WriteLine(ex.Message);
+                throw;
+            }
+
+            console.WriteLine();
+            if (m is not null) yield return m;
+        }
     }
 
     public static SelectionConsoleOptions GetSelectionOptions()

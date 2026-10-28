@@ -185,6 +185,9 @@ public abstract class BaseResourceGeneration<T>
             if (string.IsNullOrWhiteSpace(item?.Key)) continue;
             if (!rewrite && await ExistsAsync(item, cancellationToken)) continue;
             var sb = new StringBuilder();
+            sb.Append("> Icon Key = `");
+            sb.Append(item.Key);
+            sb.Append('`');
             item.ToString(sb);
             if (!string.IsNullOrWhiteSpace(item.Prompt))
             {
@@ -232,7 +235,7 @@ public abstract class BaseResourceGeneration<T>
     /// <param name="fileName">The file name.</param>
     /// <param name="cancellationToken">The token used to cancel writing the output.</param>
     /// <returns>The item result added; or null, if not exist.</returns>
-    public async Task<BatchRequirementItemResult<T>?> AddCache(string fileName, CancellationToken cancellationToken = default)
+    public async Task<BatchRequirementItemResult<T>?> AddCacheAsync(string fileName, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(fileName)) return null;
         var item = await GetFromLocal(fileName, cancellationToken);
@@ -258,7 +261,7 @@ public abstract class BaseResourceGeneration<T>
         var col = GetItems();
         if (col is not null)
         {
-            if (!loadAllReferences) col = col.Take(100).ToList();
+            if (!loadAllReferences) col = col.Take(200).ToList();
             prompt = string.Concat(prompt, Environment.NewLine, line, Environment.NewLine, Environment.NewLine, "## References", Environment.NewLine, Environment.NewLine, "```json", Environment.NewLine, JsonSerializer.Serialize(col), Environment.NewLine, "```");
         }
         else

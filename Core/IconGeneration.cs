@@ -51,7 +51,7 @@ public class IconGeneration : BaseResourceGeneration<IconSet>
         var sb = new StringBuilder(DefaultPrompts.Icon);
         sb.AppendLine();
         sb.AppendLine();
-        var items = Recent().Take(5).ToList();
+        var items = Recent().Take(10).ToList();
         if (items.Count > 0)
         {
             sb.AppendLine("# References");

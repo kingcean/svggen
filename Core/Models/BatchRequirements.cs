@@ -55,7 +55,7 @@ public class BatchRequirementItem
     /// <returns>A string that represents the current object.</returns>
     public override string ToString()
     {
-        var sb = new StringBuilder(Name);
+        var sb = new StringBuilder();
         ToString(sb);
         return sb.ToString();
     }

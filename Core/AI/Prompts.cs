@@ -25,6 +25,7 @@ internal static class DefaultPrompts
         | `name` | `string` | The description of the idea in English. |
         | `categories` | `string[]` | The categories of the idea. |
         | `description` | `string` | Optional. If the name alone is ambiguous or unclear, add a one- or two-sentence description here. |
+        | `prompt` | `string` | Optional. You can describe the elements in the image and their spatial arrangement. |
 
         Additional requirements:
         
@@ -111,8 +112,10 @@ internal static class DefaultPrompts
 
         But if the icon is about an opened folder or combination of folders, do not include the above paths.
 
-        ## For arrow category
+        ## For arrow and plain shapes
 
-        For arrow-related icons, use line-style arrows for outline icons and medium width arrows for filled icons (both solid-color and multicolor), with gradients applied to the multicolor versions.
+        - For arrow-related icons, use line-style arrows for outline icons and medium width arrows for filled icons (both solid-color and multicolor), with gradients applied to the multicolor versions.
+        - For colored icons of planar polygons and multi-pointed star shapes (in both light and dark themes) use warm-toned borders, cool-toned gradient fills (with alpha 60%). It does not apply to other scenarios.
+        - For colored icons depicting simple cube shapes, use the same style as for planar polygons, but account for highlights when coloring each face. Do not fill the back-facing faces. Draw the occluded edges as well, placing them beneath the color fills.
         """;
 }
