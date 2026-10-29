@@ -115,7 +115,7 @@ internal static class DefaultPrompts
         ## For arrow and plain shapes
 
         - For arrow-related icons, use line-style arrows for outline icons and medium width arrows for filled icons (both solid-color and multicolor), with gradients applied to the multicolor versions.
-        - For colored icons of planar polygons and multi-pointed star shapes (in both light and dark themes) use warm-toned borders, cool-toned gradient fills (with alpha 60%). It does not apply to other scenarios.
+        - For colored icons of planar polygons and multi-pointed star shapes (in both light and dark themes) use warm-toned borders, cool-toned gradient fills (with alpha 60%). It does not apply to other scenarios (e.g. tangram).
         - For colored icons depicting simple cube shapes, use the same style as for planar polygons, but account for highlights when coloring each face. Do not fill the back-facing faces. Draw the occluded edges as well, placing them beneath the color fills.
         """;
 }

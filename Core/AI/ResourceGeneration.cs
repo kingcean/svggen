@@ -108,7 +108,7 @@ public abstract class BaseResourceGeneration<T>
     /// <param name="cancellationToken">The token used to cancel the chat request.</param>
     /// <returns>The generated model, or the default value of <typeparamref name="T"/> if the request is blank, no chat client is configured, the response has fewer than ten characters, or deserialization returns the default value.</returns>
     /// <exception cref="JsonException">The response is not valid JSON for <typeparamref name="T"/>.</exception>
-    public async Task<T?> GetAsync(string q, CancellationToken cancellationToken = default)
+    public async Task<T?> CreateAsync(string q, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(q) || chat is null) return default;
         var messages = chat.GetStreamingResponseAsync([
@@ -162,7 +162,7 @@ public abstract class BaseResourceGeneration<T>
     public async Task<T?> ProcesssAsync(string q, string fileName, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
-        var model = await GetAsync(q, cancellationToken);
+        var model = await CreateAsync(q, cancellationToken);
         if (model is null) return default;
         await ProcesssAsync(model, fileName, cancellationToken);
         recent.Add(fileName, new(fileName, q, model));
@@ -196,7 +196,7 @@ public abstract class BaseResourceGeneration<T>
                 sb.Append(item.Prompt);
             }
 
-            var model = await GetAsync(sb.ToString(), cancellationToken);
+            var model = await CreateAsync(sb.ToString(), cancellationToken);
             if (model is null) continue;
             await ProcesssAsync(model, item.Key, cancellationToken);
             if (model is null) continue;
@@ -243,6 +243,7 @@ public abstract class BaseResourceGeneration<T>
         recent.Add(item.Key, item);
         return item;
     }
+
     /// <summary>
     /// Generates some ideas.
     /// </summary>
@@ -261,7 +262,7 @@ public abstract class BaseResourceGeneration<T>
         var col = GetItems();
         if (col is not null)
         {
-            if (!loadAllReferences) col = col.Take(200).ToList();
+            if (!loadAllReferences) col = col.Take(500).ToList();
             prompt = string.Concat(prompt, Environment.NewLine, line, Environment.NewLine, Environment.NewLine, "## References", Environment.NewLine, Environment.NewLine, "```json", Environment.NewLine, JsonSerializer.Serialize(col), Environment.NewLine, "```");
         }
         else
@@ -293,6 +294,50 @@ public abstract class BaseResourceGeneration<T>
         var s = sb.ToString().Trim();
         if (s.Length < 10) return null;
         return s;
+    }
+
+    /// <summary>
+    /// Search the resource items.
+    /// </summary>
+    /// <param name="q">The query string used to search.</param>
+    /// <param name="path">The path of the batch config file; or null, if load the one in workspace.</param>
+    /// <returns>A collection of the requirement items in the batch file.</returns>
+    protected internal IEnumerable<BatchRequirementItem> SearchItems(string q, string? path = null)
+    {
+        var col = GetItems(path);
+        if (col is null || string.IsNullOrWhiteSpace(q)) yield break;
+        if (q.StartsWith("category:") || q.StartsWith("-category "))
+        {
+            q = q[9..].Trim().ToLowerInvariant();
+            foreach (var item in col)
+            {
+                if (string.IsNullOrWhiteSpace(item?.Name)) continue;
+                if (item.Categories is not null && item.Categories.Contains(q)) yield return item;
+            }
+
+            yield break;
+        }
+
+        var category = q.Trim().ToLowerInvariant();
+        foreach (var item in col)
+        {
+            if (string.IsNullOrWhiteSpace(item?.Name)) continue;
+            if (item.Name.Contains(q) || item.Key == category) yield return item;
+            else if (item.Categories is not null && item.Categories.Contains(category)) yield return item;
+        }
+    }
+
+    /// <summary>
+    /// Search the resource items.
+    /// </summary>
+    /// <param name="predicate">A function to test each element for a condition.</param>
+    /// <param name="path">The path of the batch config file; or null, if load the one in workspace.</param>
+    /// <returns>A collection of the requirement items in the batch file.</returns>
+    protected internal IEnumerable<BatchRequirementItem> SearchItems(Func<BatchRequirementItem, bool> predicate, string? path = null)
+    {
+        var col = GetItems(path);
+        if (col is null) return [];
+        return col.Where(predicate);
     }
 
     /// <summary>
@@ -335,11 +380,11 @@ public abstract class BaseResourceGeneration<T>
     protected abstract Task OnProcessAsync(T model, string container, string fileName, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Adds an exist model to cache.
+    /// Gets an exist model.
     /// </summary>
     /// <param name="fileName">The file name.</param>
     /// <param name="cancellationToken">The token used to cancel writing the output.</param>
-    /// <returns>The item result added; or null, if not exist.</returns>
+    /// <returns>The item result got; or null, if not exist.</returns>
     protected abstract Task<BatchRequirementItemResult<T>?> GetFromLocal(string fileName, CancellationToken cancellationToken = default);
 
     /// <summary>
