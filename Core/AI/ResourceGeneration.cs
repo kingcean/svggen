@@ -245,6 +245,50 @@ public abstract class BaseResourceGeneration<T>
     }
 
     /// <summary>
+    /// Search the resource items.
+    /// </summary>
+    /// <param name="key">The icon key.</param>
+    /// <param name="path">The path of the batch config file; or null, if load the one in workspace.</param>
+    /// <returns>A collection of the requirement items in the batch file.</returns>
+    public BatchRequirementItem? GetItem(string key, string? path = null)
+        => GetItem(key, path, out _);
+
+    /// <summary>
+    /// Search the resource items.
+    /// </summary>
+    /// <param name="key">The icon key.</param>
+    /// <param name="path">The path of the batch config file; or null, if load the one in workspace.</param>
+    /// <param name="hasCache">true if has cache; otherwise, false.</param>
+    /// <returns>A collection of the requirement items in the batch file.</returns>
+    public BatchRequirementItem? GetItem(string key, string? path, out bool hasCache)
+    {
+        if (recent.TryGet(key, out var value) && value?.Input is not null)
+        {
+            hasCache = true;
+            return value.Input;
+        }
+
+        hasCache = false;
+        var col = GetItems(path);
+        if (col is null || string.IsNullOrWhiteSpace(key)) return null;
+        foreach (var item in col)
+        {
+            if (!string.IsNullOrWhiteSpace(item?.Key) && item.Key == key) return item;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Search the resource items.
+    /// </summary>
+    /// <param name="key">The icon key.</param>
+    /// <param name="hasCache">true if has cache; otherwise, false.</param>
+    /// <returns>A collection of the requirement items in the batch file.</returns>
+    public BatchRequirementItem? GetItem(string key, out bool hasCache)
+        => GetItem(key, null, out hasCache);
+
+    /// <summary>
     /// Generates some ideas.
     /// </summary>
     /// <param name="q">The input ideas.</param>

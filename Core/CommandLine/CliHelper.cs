@@ -64,7 +64,7 @@ internal static class CliHelper
         }
     }
 
-    public static async IAsyncEnumerable<T> GenerateAsync<T>(StyleConsole? console, BaseResourceGeneration<T> service)
+    public static async IAsyncEnumerable<T> GenerateAsync<T>(StyleConsole? console, BaseResourceGeneration<T> service, CancellationToken cancellationToken = default)
     {
         console ??= StyleConsole.Default;
         while (true)
@@ -75,6 +75,24 @@ internal static class CliHelper
             console.Write("> ");
             var name = console.ReadLine();
             if (string.IsNullOrWhiteSpace(name)) yield break;
+            var exist = service.GetItem(name, out var hasCache);
+            if (exist is not null && !hasCache)
+            {
+                console.Append("Already exist. New one will override it. ");
+                console.WriteLine(exist.Name);
+                console.Write("Need add the old one to cache?  [Y/n]  ");
+                var c = console.ReadKey();
+                console.WriteLine();
+                switch (c.Key)
+                {
+                    case ConsoleKey.Y:
+                    case ConsoleKey.A:
+                    case ConsoleKey.Enter:
+                        await service.AddCacheAsync(name, cancellationToken);
+                        break;
+                }
+            }
+
             console.WriteLine("Type the theme and requirements for the icon.");
             console.Write("> ");
             var q = console.ReadLine();

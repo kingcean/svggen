@@ -96,7 +96,7 @@ internal static class DefaultPrompts
         - For color icon for light theme, the first path should be filled with `#F6F6F6`, stroked with `#AAA` and 8px width; the second path should be filled with `#CCC` without stroke.
         - For color icon for dark theme, the first path should be filled with `#333`, stroked with `#999` and 8px width; the second path should be filled with `#999` without stroke.
 
-        But if the file icon is an application, terminal or other type that does not have a container, do not include the above paths.
+        But if the file icon is an application, terminal, file property or other type that does not have a container, do not include the above paths.
 
         ## For folder category
 
@@ -110,12 +110,12 @@ internal static class DefaultPrompts
         - For color icon for light theme, the first path should be filled with `#E9A52B`; the second path should be filled with `#FFD16B`.
         - For color icon for dark theme, the first path should be filled with `#D79A35`; the second path should be filled with `#F5C65F`.
 
-        But if the icon is about an opened folder or combination of folders, do not include the above paths.
+        But if the icon is about an opened folder, the folder property or combination of folders, do not include the above paths.
 
         ## For arrow and plain shapes
 
         - For arrow-related icons, use line-style arrows for outline icons and medium width arrows for filled icons (both solid-color and multicolor), with gradients applied to the multicolor versions.
-        - For colored icons of planar polygons and multi-pointed star shapes (in both light and dark themes) use warm-toned borders, cool-toned gradient fills (with alpha 60%). It does not apply to other scenarios (e.g. tangram).
-        - For colored icons depicting simple cube shapes, use the same style as for planar polygons, but account for highlights when coloring each face. Do not fill the back-facing faces. Draw the occluded edges as well, placing them beneath the color fills.
+        - For colored icons of planar polygons and multi-pointed star shapes (in both light and dark themes) use warm-toned borders, cool-toned gradient fills (with alpha 60%). If an icon does not represent a planar polygons nor a multi-pointed star but merely uses one to convey its meaning, this rule does not apply.
+        - For colored icons depicting simple cube shapes, use the same style as for planar polygons, but account for highlights when coloring each face. Do not fill the back-facing faces. Draw the occluded edges as well, placing them beneath the color fills. If an icon does not represent a simple cube shape but merely uses one to convey its meaning, this rule does not apply.
         """;
 }
